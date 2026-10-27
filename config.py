@@ -145,3 +145,23 @@ GEMINI_MODELS = [
     "gemini-2.5-pro",
     "gemini-1.5-flash"
 ]
+
+# SIT/VTU University Configured Grading Scale
+GRADING_SCALE = [
+    {"min_percent": 90.0, "grade": "O (Outstanding)", "points": 10, "status": "Pass"},
+    {"min_percent": 80.0, "grade": "A+ (Excellent)", "points": 9, "status": "Pass"},
+    {"min_percent": 70.0, "grade": "A (Very Good)", "points": 8, "status": "Pass"},
+    {"min_percent": 60.0, "grade": "B+ (Good)", "points": 7, "status": "Pass"},
+    {"min_percent": 50.0, "grade": "B (Above Average)", "points": 6, "status": "Pass"},
+    {"min_percent": 40.0, "grade": "C (Pass)", "points": 5, "status": "Pass"},
+    {"min_percent": 0.0, "grade": "F (Re-attempt Recommended)", "points": 0, "status": "Fail"}
+]
+
+def calculate_grade(percentage: float) -> tuple:
+    """
+    Returns (grade_string, status_string, grade_points) according to SIT/VTU guidelines.
+    """
+    for level in GRADING_SCALE:
+        if percentage >= level["min_percent"]:
+            return level["grade"], level["status"], level["points"]
+    return "F (Re-attempt Recommended)", "Fail", 0
