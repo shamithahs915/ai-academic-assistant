@@ -7,9 +7,7 @@ def create_sample_academic_pdf(output_path: str):
     # Page 1: Module 1 - Virtual Memory & Paging
     page1 = doc.new_page()
     rect = fitz.Rect(50, 50, 550, 750)
-    text1 = """SIDDAGANGA INSTITUTE OF TECHNOLOGY
-DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING
-COURSE: OPERATING SYSTEMS (21CS42)
+    text1 = """
 
 MODULE 1: VIRTUAL MEMORY AND PAGING
 

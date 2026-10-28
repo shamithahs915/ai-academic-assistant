@@ -258,18 +258,17 @@ class DiagramEngine:
                 }}
                 .diagram-card {{
                     background: #ffffff;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 12px;
-                    padding: 18px;
-                    width: 95%;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                    border: 1px solid #e5e7eb;
+                    border-radius: 6px;
+                    padding: 16px;
+                    width: 98%;
                 }}
                 .diagram-title {{
-                    font-size: 14px;
+                    font-size: 13px;
                     font-weight: 600;
-                    color: #1e293b;
+                    color: #374151;
                     margin-bottom: 12px;
-                    border-bottom: 2px solid #3b82f6;
+                    border-bottom: 2px solid #2563eb;
                     padding-bottom: 4px;
                     display: inline-block;
                 }}
@@ -282,7 +281,7 @@ class DiagramEngine:
         </head>
         <body>
             <div class="diagram-card">
-                <div class="diagram-title">📊 {title}</div>
+                <div class="diagram-title">{title}</div>
                 <div class="mermaid">
 {clean_code}
                 </div>

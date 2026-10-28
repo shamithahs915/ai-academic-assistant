@@ -8,6 +8,8 @@ class PDFChunk:
         self.text = text
         self.page = page
         self.chunk_id = chunk_id
+
+        
         self.source_doc = source_doc
         self.doc_id = doc_id or "default_doc"
         self.section = section or f"Page {page}"

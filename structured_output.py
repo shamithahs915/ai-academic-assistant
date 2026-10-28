@@ -147,7 +147,7 @@ class StructuredOutputPipeline:
             char_items = []
             max_bullets = max(2, target_points - 2)  # reserve 2 for def section
             for i, s in enumerate(sentences[1:min(max_bullets + 1, len(sentences))]):
-                char_items.append(f"**Operational Invariant {i+1}**: {s}")
+                char_items.append(f"** {i+1}**: {s}")
             if not char_items:
                 char_items.append("Fundamental operating principles specified in course syllabus.")
 
