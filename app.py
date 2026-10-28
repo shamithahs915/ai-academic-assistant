@@ -43,183 +43,443 @@ from blueprint_engine import AcademicBlueprintEngine, compute_doc_fingerprint
 # Initialize database
 init_db()
 
-# Streamlit Page Configuration - Clean Academic Layout
+# Streamlit Page Configuration
 st.set_page_config(
     page_title="StudyGenie – AI Academic Assistant",
+    page_icon="📖",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Minimal, Clean Academic Styling (No gradients, neon, or excessive decoration)
+# Modern Academic Styling: Soft Blue, Subtle Lavender Accents, White & Slate
 st.markdown("""
 <style>
-    /* Base typography and clean light background */
+    /* Global Theme & Typography */
+    :root {
+        --primary-blue: #2563eb;
+        --primary-blue-hover: #1d4ed8;
+        --primary-blue-light: #eff6ff;
+        --lavender-accent: #7c3aed;
+        --lavender-light: #ede9fe;
+        --lavender-tint: #f5f3ff;
+        --text-navy: #0f172a;
+        --text-slate: #1e293b;
+        --text-muted: #64748b;
+        --bg-page: #f8fafc;
+        --bg-surface: #ffffff;
+        --border-light: #e2e8f0;
+        --border-dashed: #cbd5e1;
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 14px;
+        --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+    }
+
     html, body, [data-testid="stAppViewContainer"] {
-        background-color: #fbfbfd;
-        color: #1f2937;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: var(--bg-page);
+        color: var(--text-slate);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
     }
 
     [data-testid="stSidebar"] {
-        background-color: #f8fafc;
-        border-right: 1px solid #e5e7eb;
+        background-color: #ffffff;
+        border-right: 1px solid var(--border-light);
     }
 
-    /* Minimal Header */
-    .app-header {
-        border-bottom: 1px solid #e5e7eb;
-        padding-bottom: 14px;
-        margin-bottom: 22px;
+    /* Polished Header with Logo */
+    .sg-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 22px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
     }
-    .app-title {
+    .sg-header-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .sg-logo-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #eff6ff 0%, #ede9fe 100%);
+        color: #2563eb;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dbeafe;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+        flex-shrink: 0;
+    }
+    .sg-header-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-navy);
+        letter-spacing: -0.4px;
+        line-height: 1.2;
+    }
+    .sg-header-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 2px;
+    }
+    .sg-header-badges {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .sg-header-pill {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .sg-pill-lavender {
+        background: var(--lavender-tint);
+        color: var(--lavender-accent);
+        border: 1px solid var(--lavender-light);
+    }
+    .sg-pill-blue {
+        background: var(--primary-blue-light);
+        color: var(--primary-blue);
+        border: 1px solid #bfdbfe;
+    }
+
+    /* Welcome Hero Card */
+    .sg-welcome-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-light);
+        border-top: 3.5px solid #2563eb;
+        border-radius: var(--radius-lg);
+        padding: 24px 28px;
+        margin-bottom: 22px;
+        box-shadow: var(--shadow-sm);
+    }
+    .sg-welcome-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--lavender-tint);
+        color: var(--lavender-accent);
+        padding: 4px 11px;
+        border-radius: 14px;
+        font-size: 11.5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        border: 1px solid var(--lavender-light);
+    }
+    .sg-welcome-heading {
         font-size: 24px;
         font-weight: 700;
-        color: #111827;
-        margin: 0;
+        color: var(--text-navy);
+        margin: 0 0 8px 0;
         letter-spacing: -0.4px;
     }
-    .app-subtitle {
-        font-size: 13px;
-        color: #6b7280;
-        margin-top: 3px;
-        margin-bottom: 0;
+    .sg-welcome-desc {
+        font-size: 14.5px;
+        color: #475569;
+        margin: 0 0 16px 0;
+        line-height: 1.6;
+        max-width: 860px;
+    }
+    .sg-feature-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+    .sg-feature-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: #334155;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 5px 12px;
+        border-radius: var(--radius-sm);
     }
 
-    /* Main Section Headings */
-    .main-heading {
-        font-size: 20px;
-        font-weight: 600;
-        color: #111827;
-        margin: 0 0 4px 0;
+    /* Modern Panel Containers */
+    .sg-panel {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 22px 26px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
-    .main-description {
-        font-size: 14px;
-        color: #4b5563;
-        margin: 0 0 18px 0;
+    .sg-panel:hover {
+        border-color: #cbd5e1;
+        box-shadow: var(--shadow-md);
     }
 
-    /* Clean Card Containers */
-    .clean-box {
-        background-color: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 6px;
-        padding: 16px 18px;
+    /* Section Header Rows */
+    .sg-section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
         margin-bottom: 16px;
     }
-    .section-label {
-        font-size: 13px;
+    .sg-icon-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .sg-icon-blue {
+        background: var(--primary-blue-light);
+        color: var(--primary-blue);
+        border: 1px solid #dbeafe;
+    }
+    .sg-icon-lavender {
+        background: var(--lavender-tint);
+        color: var(--lavender-accent);
+        border: 1px solid var(--lavender-light);
+    }
+    .sg-section-title {
+        font-size: 16.5px;
         font-weight: 600;
-        color: #374151;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
+        color: var(--text-navy);
+        line-height: 1.2;
+    }
+    .sg-section-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 2px;
     }
 
-    /* Status Boxes */
-    .status-box {
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-left: 3px solid #2563eb;
-        border-radius: 4px;
-        padding: 10px 14px;
-        font-size: 13px;
-        color: #374151;
-        margin-top: 8px;
+    /* Upload Dropzone Container */
+    .sg-upload-dropzone {
+        border: 2px dashed var(--border-dashed);
+        border-radius: var(--radius-md);
+        background: #fafbfe;
+        padding: 16px 20px;
+        margin-bottom: 14px;
+        transition: all 0.2s ease;
     }
-    .status-box-empty {
-        background-color: #f9fafb;
-        border: 1px dashed #d1d5db;
-        border-radius: 4px;
-        padding: 10px 14px;
-        font-size: 13px;
-        color: #6b7280;
-        margin-top: 8px;
+    .sg-upload-dropzone:hover {
+        border-color: #3b82f6;
+        background: #f0f7ff;
     }
-    .info-callout {
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 4px;
-        padding: 8px 12px;
+
+    /* Upload Status Banners */
+    .sg-status-active {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-left: 4px solid #16a34a;
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        margin-top: 10px;
+    }
+    .sg-status-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sg-status-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #166534;
+    }
+    .sg-status-meta {
+        font-size: 12.5px;
+        color: #15803d;
+        margin-top: 2px;
+    }
+    .sg-status-badge {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .sg-status-idle {
+        background: #fafbfe;
+        border: 1px dashed var(--border-dashed);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        margin-top: 10px;
         font-size: 13px;
-        color: #4b5563;
+        color: var(--text-muted);
+    }
+
+    /* Marks Info Pill */
+    .sg-marks-info {
+        background: linear-gradient(135deg, #f8fafc 0%, #f5f3ff 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-sm);
+        padding: 8px 14px;
+        font-size: 13px;
+        color: #334155;
+        margin-top: 26px;
+    }
+
+    /* Answer Display Panel */
+    .sg-answer-panel {
+        background: #fcfdfe;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-lg);
+        padding: 26px 30px;
+        margin-top: 22px;
+        box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+    }
+    .sg-answer-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 18px;
+    }
+    .sg-answer-heading {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-navy);
+    }
+    .sg-answer-sub {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        margin-top: 3px;
+    }
+    .sg-answer-tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .sg-tag {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .sg-tag-blue {
+        background: var(--primary-blue-light);
+        color: var(--primary-blue);
+        border: 1px solid #bfdbfe;
+    }
+    .sg-tag-lavender {
+        background: var(--lavender-tint);
+        color: var(--lavender-accent);
+        border: 1px solid var(--lavender-light);
     }
 
     /* Scorecard for Evaluation */
-    .score-card-clean {
-        background-color: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-left: 4px solid #2563eb;
-        border-radius: 4px;
-        padding: 14px 18px;
-        margin-bottom: 16px;
+    .sg-scorecard {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #2563eb;
+        border-radius: var(--radius-md);
+        padding: 18px 22px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow-sm);
     }
-    .score-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #111827;
+    .sg-score-title {
+        font-size: 21px;
+        font-weight: 700;
+        color: var(--text-navy);
         margin: 0;
     }
-    .score-meta {
+    .sg-score-meta {
         font-size: 14px;
-        color: #4b5563;
+        color: #475569;
         margin-top: 4px;
     }
 
-    /* Source Citation */
-    .source-box {
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 4px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
+    /* Citations Box */
+    .sg-source-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        margin-bottom: 10px;
         font-size: 13px;
     }
 
-    /* Blueprint Question Card */
-    .blueprint-card {
-        background-color: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 4px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
+    /* Blueprint Card */
+    .sg-blueprint-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        transition: all 0.15s ease;
+    }
+    .sg-blueprint-card:hover {
+        border-color: #93c5fd;
+        background: #fafcff;
     }
 
-    /* Buttons */
+    /* Buttons Styling */
     .stButton > button[kind="primary"] {
-        background-color: #2563eb !important;
-        border-color: #2563eb !important;
+        background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%) !important;
+        border: 1px solid #1d4ed8 !important;
         color: #ffffff !important;
-        border-radius: 4px !important;
-        font-weight: 500 !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 14.5px !important;
+        padding: 8px 22px !important;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25) !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     .stButton > button[kind="primary"]:hover {
-        background-color: #1d4ed8 !important;
-        border-color: #1d4ed8 !important;
+        background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%) !important;
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.35) !important;
+        transform: translateY(-1px) !important;
     }
     .stButton > button {
-        border-radius: 4px !important;
+        border-radius: 8px !important;
         font-weight: 500 !important;
+        transition: all 0.15s ease !important;
     }
 
     /* Streamlit Tabs */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 4px;
-        border-bottom: 1px solid #e5e7eb;
+        gap: 8px;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 2px;
     }
     .stTabs [data-baseweb="tab"] {
         font-size: 14px;
         font-weight: 500;
-        color: #4b5563;
-        padding: 8px 16px;
-        border-radius: 4px 4px 0 0;
+        color: #475569;
+        padding: 8px 18px;
+        border-radius: 8px 8px 0 0;
         border: none;
         background: transparent;
+        transition: all 0.15s ease;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: var(--primary-blue);
+        background: #f1f5f9;
     }
     .stTabs [aria-selected="true"] {
-        color: #2563eb !important;
-        border-bottom: 2px solid #2563eb !important;
+        color: var(--primary-blue) !important;
+        border-bottom: 2.5px solid var(--primary-blue) !important;
         font-weight: 600 !important;
-        background: transparent !important;
+        background: #eff6ff !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -305,11 +565,9 @@ def process_uploaded_files(files, replace=True, api_key=None, model="gemini-2.5-
     st.session_state.all_chunks.extend(new_chunks)
     st.session_state.doc_metadata.extend(new_metadata)
     st.session_state.rag_engine.build_index(st.session_state.all_chunks)
-    
-    # Update active document IDs
     st.session_state.active_doc_ids = [d.get("doc_id") for d in st.session_state.doc_metadata]
 
-    # Generate blueprint
+    # Generate dynamic blueprint
     bp_engine = AcademicBlueprintEngine(
         api_key=api_key or os.getenv("GEMINI_API_KEY"),
         model_name=model
@@ -340,20 +598,35 @@ def load_sample_demo_mode():
         )
         st.session_state.blueprint_fingerprint = compute_doc_fingerprint(st.session_state.doc_metadata)
 
-# Header
+# Header with Book Logo & Brand
 st.markdown("""
-<div class="app-header">
-    <div class="app-title">StudyGenie</div>
-    <div class="app-subtitle">AI Academic Assistant</div>
+<div class="sg-header">
+    <div class="sg-header-left">
+        <div class="sg-logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+                <path d="M6 6h10"></path>
+                <path d="M6 10h10"></path>
+                <path d="M6 14h6"></path>
+            </svg>
+        </div>
+        <div>
+            <div class="sg-header-title">StudyGenie</div>
+            <div class="sg-header-subtitle">AI Academic Assistant</div>
+        </div>
+    </div>
+    <div class="sg-header-badges">
+        <span class="sg-header-pill sg-pill-lavender">Academic Year 2025–26</span>
+        <span class="sg-header-pill sg-pill-blue">SIT Tumakuru</span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar (Narrow, Simple & Functional)
+# Sidebar Controls
 with st.sidebar:
-    st.markdown("### Settings & Options")
+    st.markdown("### Settings & Controls")
     
-    # Model Configuration
-    st.markdown("##### AI Model")
+    st.markdown("##### AI Model Tier")
     user_api_key = st.text_input(
         "Gemini API Key (Optional)",
         value=os.getenv("GEMINI_API_KEY", ""),
@@ -372,7 +645,6 @@ with st.sidebar:
 
     st.divider()
 
-    # Document Selection Scope
     st.markdown("##### Active Documents")
     if st.session_state.doc_metadata:
         doc_names = [d.get("source_doc", "Document") for d in st.session_state.doc_metadata]
@@ -431,21 +703,64 @@ tab_study, tab_eval, tab_blueprint, tab_explorer, tab_history = st.tabs([
 # TAB 1: Main Study Assistant & Question Answering
 # =========================================================================
 with tab_study:
-    st.markdown('<div class="main-heading">Your Academic Study Assistant</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-description">Upload your study material and ask questions based on your notes.</div>', unsafe_allow_html=True)
+    # Welcome Hero Section
+    st.markdown("""
+    <div class="sg-welcome-card">
+        <div class="sg-welcome-tag">Intelligent Academic Assistant</div>
+        <h1 class="sg-welcome-heading">Your notes. Your questions. Clear answers.</h1>
+        <p class="sg-welcome-desc">
+            Upload your course notes, textbooks, or syllabus. Ask exam questions to receive syllabus-grounded answers calibrated to university mark rubrics (2M, 5M, 10M, 15M), verified architectural diagrams, and structured grading schemes.
+        </p>
+        <div class="sg-feature-strip">
+            <span class="sg-feature-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                PDF-Grounded Semantic Search
+            </span>
+            <span class="sg-feature-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Points Formula: Marks &times; 2
+            </span>
+            <span class="sg-feature-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Mermaid Diagram Generation
+            </span>
+            <span class="sg-feature-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                SIT / VTU University Grading
+            </span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # 1. Straightforward PDF Upload Area
+    # 1. PDF Upload Section (Dashed Border with Document Icon)
     with st.container():
-        st.markdown('<div class="clean-box">', unsafe_allow_html=True)
-        st.markdown('<div class="section-label">Study Material (PDF)</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="sg-panel">
+            <div class="sg-section-header">
+                <div class="sg-icon-box sg-icon-blue">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <div>
+                    <div class="sg-section-title">Upload Course Material</div>
+                    <div class="sg-section-subtitle">Drop your lecture notes, question banks, or textbook chapters in PDF format</div>
+                </div>
+            </div>
+            <div class="sg-upload-dropzone">
+        """, unsafe_allow_html=True)
         
         uploaded_files = st.file_uploader(
-            "Upload course notes or syllabus (PDF)",
+            "Upload course notes (PDF)",
             type=["pdf", "txt"],
             accept_multiple_files=True,
             label_visibility="collapsed"
         )
-        
+        st.markdown('</div>', unsafe_allow_html=True)
+
         col_up1, col_up2 = st.columns([3, 1])
         with col_up1:
             replace_existing = st.checkbox(
@@ -456,7 +771,7 @@ with tab_study:
         with col_up2:
             if uploaded_files:
                 if st.button("Process Document", type="primary", use_container_width=True):
-                    with st.spinner("Processing document, extracting text, and building search index..."):
+                    with st.spinner("Extracting text, chunking, and building semantic index..."):
                         process_uploaded_files(
                             uploaded_files,
                             replace=replace_existing,
@@ -473,24 +788,44 @@ with tab_study:
             total_c = len(st.session_state.all_chunks)
             mode_note = " (Demo Mode)" if st.session_state.get("is_demo_mode") else ""
             st.markdown(f"""
-            <div class="status-box">
-                <strong>Uploaded:</strong> {doc_names}{mode_note} &nbsp;•&nbsp; 
-                {total_p} page(s), {total_c} chunk(s) &nbsp;•&nbsp; Ready
+            <div class="sg-status-active">
+                <div class="sg-status-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <div>
+                        <div class="sg-status-title">{doc_names}{mode_note}</div>
+                        <div class="sg-status-meta">{total_p} page(s) • {total_c} semantic chunks indexed</div>
+                    </div>
+                </div>
+                <div class="sg-status-badge">RAG Ready</div>
             </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown("""
-            <div class="status-box-empty">
-                No document currently uploaded. Upload a PDF above, or click "Load Sample Notes (Demo)" in the sidebar.
+            <div class="sg-status-idle">
+                No document currently uploaded. Upload a PDF above, or click <strong>Load Sample Notes (Demo)</strong> in the sidebar.
             </div>
             """, unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # 2. Question Input Area
+    # 2. Spacious Question Section
     with st.container():
-        st.markdown('<div class="clean-box">', unsafe_allow_html=True)
-        st.markdown('<div class="section-label">Ask a Question</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="sg-panel">
+            <div class="sg-section-header">
+                <div class="sg-icon-box sg-icon-lavender">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div>
+                    <div class="sg-section-title">Ask an Academic Question</div>
+                    <div class="sg-section-subtitle">Type your question or pick directly from your document's question bank</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
 
         # Quick Pick from Active Question Bank if available
         active_presets = []
@@ -515,10 +850,10 @@ with tab_study:
             default_q = st.session_state.get("user_question_input", "")
 
         user_question = st.text_area(
-            "Question:",
+            "Question input:",
             value=default_q,
-            height=75,
-            placeholder="Enter your academic question here...",
+            height=85,
+            placeholder="e.g., Explain the concept of paging with hardware address translation and neat diagram.",
             label_visibility="collapsed"
         )
 
@@ -539,9 +874,9 @@ with tab_study:
             scheme_info = MARK_SCHEMES[target_marks]
             expected_pts = target_marks * 2
             st.markdown(f"""
-            <div class="info-callout" style="margin-top: 26px;">
-                Expected Points: <strong>{expected_pts} points</strong> ({target_marks} marks × 2) &nbsp;|&nbsp; 
-                Length: <strong>{scheme_info['expected_length']}</strong>
+            <div class="sg-marks-info">
+                <strong>Expected Points:</strong> {expected_pts} points ({target_marks} Marks &times; 2) &nbsp;|&nbsp; 
+                <strong>Standard:</strong> {scheme_info['expected_length']}
             </div>
             """, unsafe_allow_html=True)
 
@@ -585,7 +920,6 @@ with tab_study:
                     st.session_state.current_answer = result
                     st.session_state.selected_question_for_eval = user_question
                     
-                    # Persist to local database
                     save_generated_answer(
                         doc_id=1 if st.session_state.doc_metadata else None,
                         question=user_question,
@@ -598,31 +932,42 @@ with tab_study:
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # 3. Generated Answer Output Area
+    # 3. Generated Answer Section (Subtle Tinted Background, Well-Spaced)
     if st.session_state.current_answer:
         ans_data = st.session_state.current_answer
-        st.markdown('<div class="clean-box">', unsafe_allow_html=True)
+        st.markdown('<div class="sg-answer-panel">', unsafe_allow_html=True)
         
         if ans_data.get("answer_markdown") == NOT_ENOUGH_INFO_MSG:
             st.warning("The uploaded PDF does not contain enough relevant information to answer this question.")
             st.info("The semantic retrieval engine found no content directly addressing this question in the active document. Please check your question or select the relevant document.")
         else:
-            st.markdown(f"### Answer ({ans_data['marks']} Marks)")
-            
-            # Answer content
+            # Header Bar
+            st.markdown(f"""
+            <div class="sg-answer-bar">
+                <div>
+                    <div class="sg-answer-heading">Answer & Marking Scheme</div>
+                    <div class="sg-answer-sub">Question: {ans_data['question']}</div>
+                </div>
+                <div class="sg-answer-tags">
+                    <span class="sg-tag sg-tag-blue">{ans_data['marks']} Marks Standard</span>
+                    <span class="sg-tag sg-tag-lavender">{ans_data['marks'] * 2} Expected Points</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
             structured_data = ans_data.get("structured_output")
             if structured_data and ans_data.get("is_structured", True):
                 out_tab1, out_tab2, out_tab3 = st.tabs([
-                    "Formatted Answer",
-                    "Structured Sections",
-                    "JSON Schema"
+                    "Formatted Model Answer",
+                    "Structured Breakdown",
+                    "Machine JSON Schema"
                 ])
                 with out_tab1:
                     st.markdown(ans_data["answer_markdown"])
                 with out_tab2:
                     summary = structured_data.get("executive_summary")
                     if summary:
-                        st.info(f"**Summary:** {summary}")
+                        st.info(f"**Overview:** {summary}")
                     for sec in structured_data.get("sections", []):
                         st.markdown(f"#### {sec.get('heading', 'Section')}")
                         if sec.get("summary"):
@@ -660,15 +1005,15 @@ with tab_study:
                 st.markdown(f"#### Diagram: {diag_title}")
                 diagram_html = DiagramEngine.generate_html_embed(ans_data["diagram_code"], diag_title)
                 components.html(diagram_html, height=360, scrolling=True)
-                with st.expander("View Mermaid Code"):
+                with st.expander("View Mermaid Diagram Code"):
                     st.code(ans_data["diagram_code"], language="mermaid")
             elif ans_data.get("diagram_message"):
                 st.divider()
                 st.caption(f"Diagram Note: {ans_data['diagram_message']}")
 
-            # Marking Scheme
+            # Marking Scheme Table
             st.divider()
-            st.markdown(f"#### Marking Scheme ({ans_data['marks']} Marks)")
+            st.markdown(f"#### Evaluation Marking Scheme ({ans_data['marks']} Marks)")
             scheme_obj = ans_data.get("scheme", {})
             components_list = scheme_obj.get("components", [])
             if components_list:
@@ -686,9 +1031,9 @@ with tab_study:
                 with st.expander(f"Verified Citations from PDF ({len(ans_data['sources'])} chunks)"):
                     for src in ans_data["sources"]:
                         st.markdown(f"""
-                        <div class="source-box">
+                        <div class="sg-source-item">
                             <strong>{src.get('source_doc', 'Document')}</strong> — Page {src.get('page', 1)} &nbsp;|&nbsp; Relevance: <code>{src.get('score', 'High')}</code><br/>
-                            <span style="color: #4b5563;">"{src.get('text', '')[:220]}..."</span>
+                            <span style="color: #475569;">"{src.get('text', '')[:220]}..."</span>
                         </div>
                         """, unsafe_allow_html=True)
 
@@ -712,7 +1057,7 @@ with tab_study:
 """
             st.write("")
             st.download_button(
-                label="Download Answer (Markdown)",
+                label="Download Answer Sheet (Markdown)",
                 data=download_content,
                 file_name=f"Answer_{ans_data['marks']}M.md",
                 mime="text/markdown"
@@ -725,8 +1070,21 @@ with tab_study:
 # TAB 2: Student Answer Evaluator
 # =========================================================================
 with tab_eval:
-    st.markdown('<div class="main-heading">Student Answer Evaluator</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-description">Evaluate student answers against the official marking scheme and syllabus standards.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sg-panel">', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="sg-section-header">
+        <div class="sg-icon-box sg-icon-lavender">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+        </div>
+        <div>
+            <div class="sg-section-title">Student Answer Evaluator & Grading</div>
+            <div class="sg-section-subtitle">Evaluate responses against official syllabus marking schemes and calculate university grades</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     ev_mode_tab1, ev_mode_tab2 = st.tabs([
         "Single Question Grading",
@@ -737,7 +1095,6 @@ with tab_eval:
     # SUBTAB 1: Single Question Grading
     # -------------------------------------------------------------
     with ev_mode_tab1:
-        st.markdown('<div class="clean-box">', unsafe_allow_html=True)
         eval_q = st.text_input(
             "Examination Question:",
             value=st.session_state.selected_question_for_eval or (default_q or "Enter question to evaluate"),
@@ -793,7 +1150,6 @@ with tab_eval:
                     else:
                         active_scheme = None
                         model_ans = ""
-                        # Ground dynamically from uploaded PDF via RAG
                         if st.session_state.get("all_chunks") and hasattr(st.session_state.rag_engine, "search"):
                             try:
                                 top_chunks = st.session_state.rag_engine.search(
@@ -828,7 +1184,6 @@ with tab_eval:
                     
                     st.session_state.current_evaluation = eval_res
                     
-                    # Persist to database
                     save_evaluation(
                         answer_id=None,
                         question=eval_q,
@@ -843,18 +1198,16 @@ with tab_eval:
             ev = st.session_state.current_evaluation
             st.divider()
 
-            # Clean Score Box
             status_text = "Pass" if ev.get("status") == "Pass" else "Re-attempt Recommended"
             st.markdown(f"""
-            <div class="score-card-clean">
-                <div class="score-title">Score: {ev['marks_awarded']} / {ev['target_marks']} Marks ({ev['percentage']}%)</div>
-                <div class="score-meta">
+            <div class="sg-scorecard">
+                <div class="sg-score-title">Score: {ev['marks_awarded']} / {ev['target_marks']} Marks ({ev['percentage']}%)</div>
+                <div class="sg-score-meta">
                     University Grade: <strong>{ev['grade']}</strong> &nbsp;|&nbsp; Status: <strong>{status_text}</strong>
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
-            # Metrics
             col_m1, col_m2, col_m3, col_m4 = st.columns(4)
             col_m1.metric("Marks Awarded", f"{ev['marks_awarded']} / {ev['target_marks']} M")
             col_m2.metric("Score Percentage", f"{ev['percentage']}%")
@@ -962,13 +1315,10 @@ with tab_eval:
                 key="dl_single_eval_md"
             )
 
-        st.markdown('</div>', unsafe_allow_html=True)
-
     # -------------------------------------------------------------
     # SUBTAB 2: Full Paper Evaluation
     # -------------------------------------------------------------
     with ev_mode_tab2:
-        st.markdown('<div class="clean-box">', unsafe_allow_html=True)
         st.markdown("##### Multi-Question Paper Evaluation")
         st.caption("Grade multiple questions together to compute total marks, percentage, and overall grade.")
 
@@ -1024,9 +1374,9 @@ with tab_eval:
             st.divider()
 
             st.markdown(f"""
-            <div class="score-card-clean">
-                <div class="score-title">Total Score: {pres['total_marks_obtained']} / {pres['total_maximum_marks']} Marks ({pres['percentage']}%)</div>
-                <div class="score-meta">
+            <div class="sg-scorecard">
+                <div class="sg-score-title">Total Score: {pres['total_marks_obtained']} / {pres['total_maximum_marks']} Marks ({pres['percentage']}%)</div>
+                <div class="sg-score-meta">
                     Overall Grade: <strong>{pres['grade']}</strong> &nbsp;|&nbsp; Status: <strong>{pres['classification']}</strong>
                 </div>
             </div>
@@ -1059,15 +1409,30 @@ with tab_eval:
                 key="dl_paper_eval_md"
             )
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # =========================================================================
 # TAB 3: Exam Blueprint & Important Questions
 # =========================================================================
 with tab_blueprint:
-    st.markdown('<div class="main-heading">Exam Question Blueprint</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-description">Questions generated strictly from your uploaded course notes.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sg-panel">', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="sg-section-header">
+        <div class="sg-icon-box sg-icon-blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+        </div>
+        <div>
+            <div class="sg-section-title">Exam Question Blueprint & Priority Bank</div>
+            <div class="sg-section-subtitle">Priority examination questions generated strictly from your uploaded course notes</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if not st.session_state.doc_metadata or not st.session_state.all_chunks:
         st.info("No document currently loaded. Please upload course material in the 'Ask Questions' tab or sidebar.")
@@ -1127,9 +1492,9 @@ with tab_blueprint:
                 else:
                     for i, q in enumerate(q2_list):
                         st.markdown(f"""
-                        <div class="blueprint-card">
+                        <div class="sg-blueprint-card">
                             <strong>{i+1}. {q['question']}</strong><br/>
-                            <span style="color: #6b7280; font-size: 12px;">{q['source_doc']} • Page {q.get('page_reference', 1)}</span>
+                            <span style="color: #64748b; font-size: 12px;">{q['source_doc']} • Page {q.get('page_reference', 1)}</span>
                         </div>
                         """, unsafe_allow_html=True)
                         if st.button(f"Use Question #{i+1} (2M)", key=f"btn_2m_{q['source_doc']}_{i}"):
@@ -1144,9 +1509,9 @@ with tab_blueprint:
                 else:
                     for i, q in enumerate(q5_list):
                         st.markdown(f"""
-                        <div class="blueprint-card">
+                        <div class="sg-blueprint-card">
                             <strong>{i+1}. {q['question']}</strong><br/>
-                            <span style="color: #6b7280; font-size: 12px;">{q['source_doc']} • Page {q.get('page_reference', 1)}</span>
+                            <span style="color: #64748b; font-size: 12px;">{q['source_doc']} • Page {q.get('page_reference', 1)}</span>
                         </div>
                         """, unsafe_allow_html=True)
                         if st.button(f"Use Question #{i+1} (5M)", key=f"btn_5m_{q['source_doc']}_{i}"):
@@ -1162,9 +1527,9 @@ with tab_blueprint:
                 else:
                     for i, q in enumerate(q10_list):
                         st.markdown(f"""
-                        <div class="blueprint-card">
+                        <div class="sg-blueprint-card">
                             <strong>{i+1}. {q['question']}</strong><br/>
-                            <span style="color: #6b7280; font-size: 12px;">{q['source_doc']} • Page {q.get('page_reference', 1)}</span>
+                            <span style="color: #64748b; font-size: 12px;">{q['source_doc']} • Page {q.get('page_reference', 1)}</span>
                         </div>
                         """, unsafe_allow_html=True)
                         if st.button(f"Use Question #{i+1} (10M)", key=f"btn_10m_{q['source_doc']}_{i}"):
@@ -1179,9 +1544,9 @@ with tab_blueprint:
                 else:
                     for i, q in enumerate(q15_list):
                         st.markdown(f"""
-                        <div class="blueprint-card">
+                        <div class="sg-blueprint-card">
                             <strong>{i+1}. {q['question']}</strong><br/>
-                            <span style="color: #6b7280; font-size: 12px;">{q['source_doc']} • Page {q.get('page_reference', 1)}</span>
+                            <span style="color: #64748b; font-size: 12px;">{q['source_doc']} • Page {q.get('page_reference', 1)}</span>
                         </div>
                         """, unsafe_allow_html=True)
                         if st.button(f"Use Question #{i+1} (15M)", key=f"btn_15m_{q['source_doc']}_{i}"):
@@ -1189,13 +1554,28 @@ with tab_blueprint:
                             st.session_state.target_marks_input = 15
                             st.rerun()
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
 
 # =========================================================================
 # TAB 4: Document Explorer & Chunk Search
 # =========================================================================
 with tab_explorer:
-    st.markdown('<div class="main-heading">Document Explorer</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-description">Inspect extracted pages, raw text, and segment chunks.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sg-panel">', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="sg-section-header">
+        <div class="sg-icon-box sg-icon-blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </div>
+        <div>
+            <div class="sg-section-title">Document Explorer & RAG Knowledge Base</div>
+            <div class="sg-section-subtitle">Inspect extracted pages, raw text, and segment chunks used for semantic retrieval</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if not st.session_state.doc_metadata:
         st.info("No documents indexed yet.")
@@ -1219,7 +1599,7 @@ with tab_explorer:
                 col_p1.metric("Words", p_words)
                 col_p2.metric("Characters", p_chars)
                 
-                st.text_area("Page Text:", value=selected_page_text, height=140, disabled=True, key=f"raw_{doc['source_doc']}_{page_sel}")
+                st.text_area("Extracted Plain Text:", value=selected_page_text, height=140, disabled=True, key=f"raw_{doc['source_doc']}_{page_sel}")
 
         st.divider()
         st.markdown("##### Semantic Search Tester")
@@ -1242,20 +1622,35 @@ with tab_explorer:
                 )
             for r in results:
                 st.markdown(f"""
-                <div class="source-box">
+                <div class="sg-source-item">
                     <strong>Rank #{r['rank']}</strong> &nbsp;|&nbsp; 
                     Score: <code>{r['score']}</code> &nbsp;|&nbsp; Page {r['page']} ({r['source_doc']})<br/>
-                    <div style="margin-top: 4px; color: #1f2937;">{r['text']}</div>
+                    <div style="margin-top: 4px; color: #1e293b;">{r['text']}</div>
                 </div>
                 """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # =========================================================================
 # TAB 5: History & Records
 # =========================================================================
 with tab_history:
-    st.markdown('<div class="main-heading">History & Records</div>', unsafe_allow_html=True)
-    st.markdown('<div class="main-description">Saved answers and student grading records.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sg-panel">', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="sg-section-header">
+        <div class="sg-icon-box sg-icon-lavender">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+        </div>
+        <div>
+            <div class="sg-section-title">History & Saved Records</div>
+            <div class="sg-section-subtitle">Local database log of generated answers, marking schemes, and student grading sessions</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     col_h1, col_h2 = st.columns(2)
     with col_h1:
@@ -1280,3 +1675,5 @@ with tab_history:
                     st.caption(f"Excerpt: {ev_item['student_answer'][:100]}...")
                     feedback_obj = ev_item.get("feedback", {})
                     st.caption(f"Grade: {feedback_obj.get('grade', 'N/A')}")
+
+    st.markdown('</div>', unsafe_allow_html=True)
